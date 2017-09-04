@@ -1,0 +1,26 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+
+configuration:
+- Debug
+- Release
+
+before_build:
+- cmd: >-
+    mkdir build
+    
+    cd build
+    
+    cmake -G "Visual Studio 15 2017 Win64" ../
+    
+build:
+  project: build/Astral_Insanity_main.vcxproj
+  parallel: true
+  verbosity: minimal
+  
+after_build:
+- cmd: 7z a Astral_Insanity_%CONFIGURATION%.zip %APPVEYOR_BUILD_FOLDER%/build/bin/%CONFIGURATION%/Astral_Insanity_main.exe %APPVEYOR_BUILD_FOLDER%/build/bin/%CONFIGURATION%/*.dll  %APPVEYOR_BUILD_FOLDER%/build/bin/%CONFIGURATION%/**/*   
+
+artifacts:
+  - path: build/Astral_Insanity_%CONFIGURATION%.zip
+    name: Astral_Insanity_%CONFIGURATION%
