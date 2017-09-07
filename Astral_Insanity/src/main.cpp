@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <stdexcept>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 using namespace sf;
 
@@ -102,17 +104,30 @@ void RescaleOptions(RenderWindow &window) {
 }
 
 // Method to use time to continuously update the game
-void Update() {
+void Update(Vector2f &mousePos) {
   static sf::Clock clock;
   float dt = clock.restart().asSeconds();
   Vector2f move;
-  if (Keyboard::isKeyPressed(Keyboard::Left)) {
+	Vector2f rotate;
+  if (Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) {
     move.x--;
   }
-  if (Keyboard::isKeyPressed(Keyboard::Right)) {
-    move.x++;
-  }
+	if (Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) {
+		move.x++;
+	}
+	if (Keyboard::isKeyPressed(Keyboard::Up) || Keyboard::isKeyPressed(Keyboard::W)) {
+		move.y--;
+	}
+	if (Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S)) {
+		move.y++;
+	}
+
+	Vector2f playerPos = playerSprite.getPosition();
+	float ang = atan2((playerPos.y - mousePos.y), (playerPos.x - mousePos.x)) * (180 / M_PI);
+	playerSprite.setRotation(ang);
   playerSprite.move(move*300.0f*dt);
+
+	cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
 }
 
 // Methods to render desired game states
@@ -129,7 +144,6 @@ int main() {
   
 	// Initial window
   RenderWindow window(VideoMode(1280, 720), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
-	window.setMouseCursorVisible(false);
 	
 	// Try to run load method
   try {
@@ -142,11 +156,11 @@ int main() {
 	// Set sprite textures and positons **NEEDS UPDATING**
   playerSprite.setTexture(playerTexture);
   playerSprite.setScale(Vector2f(2.f, 2.f));
-
-	
+	playerSprite.setOrigin((playerSprite.getGlobalBounds().width / 2), (playerSprite.getGlobalBounds().height / 2));
 
 	// Game running while loop
   while (window.isOpen()) {
+		window.setMouseCursorVisible(false);
 
 		int mouseX = Mouse::getPosition(window).x;
 		int mouseY = Mouse::getPosition(window).y;
@@ -157,8 +171,7 @@ int main() {
 			case GameStates::START:
 				window.clear();
 				RescaleStart(window);
-				Update();
-				cursorSprite.setPosition(mouseX - cursorSprite.getGlobalBounds().width / 2, mouseY - cursorSprite.getGlobalBounds().height / 2);
+				Update(Vector2f(mouseX,mouseY));
 				RenderStart(window);
 				window.display();
 
@@ -186,6 +199,9 @@ int main() {
 						if (startEvent.key.code == Keyboard::P) {
 							window.create(sf::VideoMode(640, 480, 32), "640 x 480 Screen");
 						}
+						else if (startEvent.key.code == Keyboard::Escape) {
+							window.close();
+						}
 					}
 				}
 				if (Keyboard::isKeyPressed(Keyboard::Space)) {
@@ -199,7 +215,7 @@ int main() {
 			case GameStates::OPTIONS:
 				window.clear();
 				RescaleOptions(window);
-				Update();
+				Update(Vector2f(mouseX, mouseY));
 				cursorSprite.setPosition(mouseX - cursorSprite.getGlobalBounds().width / 2, mouseY - cursorSprite.getGlobalBounds().height / 2);
 				RenderOptions(window);
 				window.display();
@@ -244,7 +260,7 @@ int main() {
 
 			case GameStates::LEVEL_1:
 				window.clear();
-				Update();
+				Update(Vector2f(mouseX, mouseY));
 				cursorSprite.setPosition(mouseX - cursorSprite.getGlobalBounds().width / 2, mouseY - cursorSprite.getGlobalBounds().height / 2);
 				RenderLevel(window);
 				window.display();
