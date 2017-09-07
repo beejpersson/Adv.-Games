@@ -124,7 +124,7 @@ void Update(Vector2f &mousePos) {
 
 	Vector2f playerPos = playerSprite.getPosition();
 	float ang = atan2((playerPos.y - mousePos.y), (playerPos.x - mousePos.x)) * (180 / M_PI);
-	playerSprite.setRotation(ang);
+	playerSprite.setRotation(ang-90);
   playerSprite.move(move*300.0f*dt);
 
 	cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
@@ -155,8 +155,8 @@ int main() {
 
 	// Set sprite textures and positons **NEEDS UPDATING**
   playerSprite.setTexture(playerTexture);
-  playerSprite.setScale(Vector2f(2.f, 2.f));
-	playerSprite.setOrigin((playerSprite.getGlobalBounds().width / 2), (playerSprite.getGlobalBounds().height / 2));
+	playerSprite.setOrigin((playerTexture.getSize().x / 2), (playerTexture.getSize().y / 2));
+	playerSprite.setScale(Vector2f(2.f, 2.f));
 
 	// Game running while loop
   while (window.isOpen()) {
