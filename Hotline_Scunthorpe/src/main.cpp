@@ -51,70 +51,97 @@ void Load() {
 // Rescale all sprites when window resolution is changed
 void RescaleStart(RenderWindow &window) {
 	startScreenSprite.setTexture(startScreenTexture);
-	startScreenSprite.setScale(Vector2f(float(window.getSize().x) / float(startScreenTexture.getSize().x), float(window.getSize().y) / float(startScreenTexture.getSize().y)));
+	//startScreenSprite.setScale(Vector2f(float(window.getSize().x) / float(startScreenTexture.getSize().x), float(window.getSize().y) / float(startScreenTexture.getSize().y)));
 	//startScreenSprite.setScale(Vector2f(1280 / 1920.f, 720 / 1080.f));
 
 	cursorSprite.setTexture(cursorTexture);
 
-	startButton.setSize(Vector2f(window.getSize().x * 0.17, window.getSize().y * 0.06));
+	/*startButton.setSize(Vector2f(window.getSize().x * 0.17, window.getSize().y * 0.06));
 	startButton.setPosition(window.getSize().x * 0.4, window.getSize().y * 0.55);
+	startButton.setFillColor(Color::Blue);*/
+	startButton.setSize(Vector2f(326, 65));
+	startButton.setPosition(768, 594);
 	startButton.setFillColor(Color::Blue);
 
-	optionsButton.setSize(Vector2f(window.getSize().x * 0.17, window.getSize().y * 0.06));
+	/*optionsButton.setSize(Vector2f(window.getSize().x * 0.17, window.getSize().y * 0.06));
 	optionsButton.setPosition(window.getSize().x * 0.4, window.getSize().y * 0.61);
+	optionsButton.setFillColor(Color::Green);*/
+	optionsButton.setSize(Vector2f(326, 65));
+	optionsButton.setPosition(768, 659);
 	optionsButton.setFillColor(Color::Green);
 
-	quitButton.setSize(Vector2f(window.getSize().x * 0.17, window.getSize().y * 0.06));
+	/*quitButton.setSize(Vector2f(window.getSize().x * 0.17, window.getSize().y * 0.06));
 	quitButton.setPosition(window.getSize().x * 0.4, window.getSize().y * 0.67);
+	quitButton.setFillColor(Color::Red);*/
+	quitButton.setSize(Vector2f(326, 65));
+	quitButton.setPosition(768, 724);
 	quitButton.setFillColor(Color::Red);
 }
 
 // Rescales the options menu
 void RescaleOptions(RenderWindow &window) {
 	optionsScreenSprite.setTexture(optionsScreenTexture);
-	optionsScreenSprite.setScale(Vector2f(float(window.getSize().x) / float(startScreenTexture.getSize().x), float(window.getSize().y) / float(startScreenTexture.getSize().y)));
+	//optionsScreenSprite.setScale(Vector2f(float(window.getSize().x) / float(startScreenTexture.getSize().x), float(window.getSize().y) / float(startScreenTexture.getSize().y)));
 
-	res1080Button.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
+	/*res1080Button.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
 	res1080Button.setPosition(window.getSize().x * 0.38, window.getSize().y * 0.08);
+	res1080Button.setFillColor(Color::Cyan);*/
+	res1080Button.setSize(Vector2f(420, 140));
+	res1080Button.setPosition(730, 86);
 	res1080Button.setFillColor(Color::Cyan);
 
-	res900Button.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
+	/*res900Button.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
 	res900Button.setPosition(window.getSize().x * 0.38, window.getSize().y * 0.21);
+	res900Button.setFillColor(Color::Yellow);*/
+	res900Button.setSize(Vector2f(420, 140));
+	res900Button.setPosition(730, 226);
 	res900Button.setFillColor(Color::Yellow);
 
-	res720Button.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
+	/*res720Button.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
 	res720Button.setPosition(window.getSize().x * 0.38, window.getSize().y * 0.34);
+	res720Button.setFillColor(Color::Red);*/
+	res720Button.setSize(Vector2f(420, 140));
+	res720Button.setPosition(730, 366);
 	res720Button.setFillColor(Color::Red);
 
-	resWindowedButton.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
+	/*resWindowedButton.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
 	resWindowedButton.setPosition(window.getSize().x * 0.38, window.getSize().y * 0.47);
+	resWindowedButton.setFillColor(Color::Blue);*/
+	resWindowedButton.setSize(Vector2f(420, 140));
+	resWindowedButton.setPosition(730, 506);
 	resWindowedButton.setFillColor(Color::Blue);
 
-	resFullscreenButton.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
+	/*resFullscreenButton.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
 	resFullscreenButton.setPosition(window.getSize().x * 0.38, window.getSize().y * 0.60);
+	resFullscreenButton.setFillColor(Color::Green);*/
+	resFullscreenButton.setSize(Vector2f(420, 140));
+	resFullscreenButton.setPosition(730, 646);
 	resFullscreenButton.setFillColor(Color::Green);
 
-	optionsBackButton.setSize(Vector2f(window.getSize().x * 0.13, window.getSize().y * 0.12));
+	/*optionsBackButton.setSize(Vector2f(window.getSize().x * 0.13, window.getSize().y * 0.12));
 	optionsBackButton.setPosition(window.getSize().x * 0.42, window.getSize().y * 0.81);
+	optionsBackButton.setFillColor(Color::Magenta);*/
+	optionsBackButton.setSize(Vector2f(250, 140));
+	optionsBackButton.setPosition(805, 875);
 	optionsBackButton.setFillColor(Color::Magenta);
 }
 
-Vector2f CurrentPlayerPosition(RenderWindow &window) {
-	Vector2f playerPosRatio = Vector2f(float(playerSprite.getPosition().x) / window.getSize().x, float(playerSprite.getPosition().y) / window.getSize().y);
-	std::cout << "\n Ratio x: " << playerPosRatio.x << " \t Ratio y: " << playerPosRatio.y << " \t Window res: " << window.getSize().x << " x " << window.getSize().y << "\t x pos: " << playerSprite.getPosition().x << "\t y pos: " << playerSprite.getPosition().y;
-	return playerPosRatio;
-}
-
-void RepositionPlayer(RenderWindow &window, Vector2f playerPosRatio) {
-	playerSprite.setPosition(Vector2f(float(window.getSize().x) * playerPosRatio.x, float(window.getSize().y) * playerPosRatio.y));
-	std::cout << "\n x pos = " << playerSprite.getPosition().x << " ---- y pos = " << playerSprite.getPosition().y;
-}
+//Vector2f CurrentPlayerPosition(RenderWindow &window) {
+//	Vector2f playerPosRatio = Vector2f(float(playerSprite.getPosition().x) / window.getSize().x, float(playerSprite.getPosition().y) / window.getSize().y);
+//	//std::cout << "\n Ratio x: " << playerPosRatio.x << " \t Ratio y: " << playerPosRatio.y << " \t Window res: " << window.getSize().x << " x " << window.getSize().y << "\t x pos: " << playerSprite.getPosition().x << "\t y pos: " << playerSprite.getPosition().y;
+//	return playerPosRatio;
+//}
+//
+//void RepositionPlayer(RenderWindow &window, Vector2f playerPosRatio) {
+//	playerSprite.setPosition(Vector2f(float(window.getSize().x) * playerPosRatio.x, float(window.getSize().y) * playerPosRatio.y));
+//	//std::cout << "\n x pos = " << playerSprite.getPosition().x << " ---- y pos = " << playerSprite.getPosition().y;
+//}
 
 void RescaleLevel1(RenderWindow &window) {
 	// Set sprite textures and positons **NEEDS UPDATING**
 	playerSprite.setTexture(playerTexture);
 	playerSprite.setOrigin((playerTexture.getSize().x / 2), (playerTexture.getSize().y / 2));
-	playerSprite.setScale(Vector2f(float(window.getSize().x) / 3840.f, float(window.getSize().y) / 2160.f));
+	playerSprite.setScale(Vector2f(0.5f, 0.5f));
 	
 } 
 
@@ -140,15 +167,15 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 	Vector2f playerPos = playerSprite.getPosition();
 	float ang = atan2((playerPos.y - mousePos.y), (playerPos.x - mousePos.x)) * (180 / M_PI);
 	playerSprite.setRotation(ang+180);
-  playerSprite.move(move * float(window.getSize().x) * 300.f / 1920.f * dt);
+  playerSprite.move(move*300.f*dt);
 
 	cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
 }
 
 // Methods to render desired game states
 void RenderLevel(RenderWindow &window) { window.draw(playerSprite), window.draw(cursorSprite); }
-void RenderStart(RenderWindow &window) { window.draw(startScreenSprite), window.draw(cursorSprite)/*, window.draw(startButton), window.draw(optionsButton), window.draw(quitButton)*/; }
-void RenderOptions(RenderWindow &window) { window.draw(optionsScreenSprite), window.draw(cursorSprite)/*, window.draw(res1080Button), window.draw(res900Button), window.draw(res720Button), window.draw(resWindowedButton), window.draw(resFullscreenButton), window.draw(optionsBackButton)*/; }
+void RenderStart(RenderWindow &window) { window.draw(startScreenSprite), window.draw(cursorSprite), window.draw(startButton), window.draw(optionsButton), window.draw(quitButton); }
+void RenderOptions(RenderWindow &window) { window.draw(optionsScreenSprite), window.draw(cursorSprite), window.draw(res1080Button), window.draw(res900Button), window.draw(res720Button), window.draw(resWindowedButton), window.draw(resFullscreenButton), window.draw(optionsBackButton); }
 
 int main() {
   
@@ -158,7 +185,9 @@ int main() {
 	GameStates lastGameState = GameStates::START;
   
 	// Initial window
-  RenderWindow window(VideoMode(1280, 720), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
+  RenderWindow window(VideoMode(1920, 1080), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
+	View view(FloatRect(0, 0, 1920, 1080));
+	window.setView(view);
 	
 	// Try to run load method
   try {
@@ -171,10 +200,8 @@ int main() {
 	// Game running while loop
   while (window.isOpen()) {
 		window.setMouseCursorVisible(false);
-
-		int mouseX = Mouse::getPosition(window).x;
-		int mouseY = Mouse::getPosition(window).y;
 		Vector2f playerPosRatio;
+		Vector2f mousePos;
 
 
 		// Game state switches with each state's running methods within
@@ -182,7 +209,8 @@ int main() {
 			case GameStates::START:
 				window.clear();
 				RescaleStart(window);
-				Update(Vector2f(mouseX,mouseY), window);
+				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+				Update(Vector2f(mousePos.x, mousePos.y), window);
 				RenderStart(window);
 				window.display();
 
@@ -193,22 +221,23 @@ int main() {
 					}
 					else if (startEvent.type == Event::MouseButtonPressed) {
 						// If start button is clicked, go to LEVEL_1 game state
-						if (startButton.getGlobalBounds().contains(mouseX, mouseY)) {
+						if (startButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							gameState = GameStates::LEVEL_1;
 							lastGameState = gameState;
 						}
 						// If options button is clicked, go to OPTIONS game state
-						else if (optionsButton.getGlobalBounds().contains(mouseX, mouseY)) {
+						else if (optionsButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							gameState = GameStates::OPTIONS;
 						}
 						// If quit button is clicked, exit the game
-						else if (quitButton.getGlobalBounds().contains(mouseX, mouseY)) {
+						else if (quitButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							window.close();
 						}
 					}
 					else if (startEvent.type == Event::KeyPressed) {
 						if (startEvent.key.code == Keyboard::P) {
-							window.create(sf::VideoMode(640, 480, 32), "640 x 480 Screen");
+							window.create(VideoMode(640, 480), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
+							window.setView(view);
 						}
 						else if (startEvent.key.code == Keyboard::Escape) {
 							window.close();
@@ -226,12 +255,12 @@ int main() {
 			case GameStates::OPTIONS:
 				window.clear();
 				RescaleOptions(window);
-				Update(Vector2f(mouseX, mouseY), window);
-				cursorSprite.setPosition(mouseX - cursorSprite.getGlobalBounds().width / 2, mouseY - cursorSprite.getGlobalBounds().height / 2);
+				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+				Update(Vector2f(mousePos.x, mousePos.y), window);
 				RenderOptions(window);
 				window.display();
 
-				playerPosRatio = CurrentPlayerPosition(window);
+				//playerPosRatio = CurrentPlayerPosition(window);
 
 				Event optionsEvent;
 				while (window.pollEvent(optionsEvent)) {
@@ -240,29 +269,34 @@ int main() {
 					}
 					else if (optionsEvent.type == Event::MouseButtonPressed) {
 						// Choose resolution and windowed or fullscreen
-						if (res1080Button.getGlobalBounds().contains(mouseX, mouseY)) {
+						if (res1080Button.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							window.create(sf::VideoMode(1920, 1080), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
-							RepositionPlayer(window, playerPosRatio);
+							window.setView(view);
+							//RepositionPlayer(window, playerPosRatio);
 
 						}
-						else if (res900Button.getGlobalBounds().contains(mouseX, mouseY)) {
+						else if (res900Button.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							window.create(sf::VideoMode(1600, 900), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
-							RepositionPlayer(window, playerPosRatio);
+							//RepositionPlayer(window, playerPosRatio);
+							window.setView(view);
 						}
-						else if (res720Button.getGlobalBounds().contains(mouseX, mouseY)) {
+						else if (res720Button.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							window.create(sf::VideoMode(1280, 720), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
-							RepositionPlayer(window, playerPosRatio);
+							window.setView(view);
+							//RepositionPlayer(window, playerPosRatio);
 						}
-						else if (resWindowedButton.getGlobalBounds().contains(mouseX, mouseY)) {
+						else if (resWindowedButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							window.create(sf::VideoMode(window.getSize().x, window.getSize().y), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
-							RepositionPlayer(window, playerPosRatio);
+							window.setView(view);
+							//RepositionPlayer(window, playerPosRatio);
 						}
-						else if (resFullscreenButton.getGlobalBounds().contains(mouseX, mouseY)) {
+						else if (resFullscreenButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							window.create(sf::VideoMode(window.getSize().x, window.getSize().y), "Hotline Scunthorpe", Style::Fullscreen);
-							RepositionPlayer(window, playerPosRatio);
+							window.setView(view);
+							//RepositionPlayer(window, playerPosRatio);
 						}
 
-						else if (optionsBackButton.getGlobalBounds().contains(mouseX, mouseY)) {
+						else if (optionsBackButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							gameState = lastGameState;
 						}
 					}
@@ -272,8 +306,8 @@ int main() {
 			case GameStates::LEVEL_1:
 				window.clear();
 				RescaleLevel1(window);
-				Update(Vector2f(mouseX, mouseY), window);
-				cursorSprite.setPosition(mouseX - cursorSprite.getGlobalBounds().width / 2, mouseY - cursorSprite.getGlobalBounds().height / 2);
+				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+				Update(Vector2f(mousePos.x, mousePos.y), window);
 				RenderLevel(window);
 				window.display();
 				Event level1Event;
