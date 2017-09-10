@@ -6,14 +6,23 @@
 
 using namespace sf;
 
-Texture playerTexture;
-Sprite playerSprite;
 Texture startScreenTexture;
 Sprite startScreenSprite;
 Texture cursorTexture;
 Sprite cursorSprite;
 Texture optionsScreenTexture;
 Sprite optionsScreenSprite;
+Texture level1BackgroundTexture;
+Sprite level1BackgroundSprite;
+Texture level2BackgroundTexture;
+Sprite level2BackgroundSprite;
+Texture playerTexture;
+Texture playerRifleTexture;
+Sprite playerSprite;
+Texture enemyTurretATexture;
+Sprite enemyTurretASprite;
+Texture rifleTexture;
+Sprite rifleSprite;
 
 RectangleShape startButton;
 RectangleShape optionsButton;
@@ -24,17 +33,19 @@ RectangleShape res720Button;
 RectangleShape resWindowedButton;
 RectangleShape resFullscreenButton;
 RectangleShape optionsBackButton;
+RectangleShape rifleLocation;
+RectangleShape level1Exit;
 
 // The different states of the game
 enum class GameStates { START, MENU, OPTIONS, LEVEL_1, LEVEL_2 };
 
 // Method to load in required textures
 void Load() {
-  
-  if (!playerTexture.loadFromFile("res/img/player.png")) {
-    throw std::invalid_argument("Loading error!");
-  }
 	
+	if (!cursorTexture.loadFromFile("res/img/cursor.png")) {
+		throw std::invalid_argument("Loading error!");
+	}
+
 	if (!startScreenTexture.loadFromFile("res/img/start_screen.png")) {
 		throw std::invalid_argument("Loading error!");
 	}
@@ -42,115 +53,120 @@ void Load() {
 	if (!optionsScreenTexture.loadFromFile("res/img/options.png")) {
 		throw std::invalid_argument("Loading error!");
 	}
-
-	if (!cursorTexture.loadFromFile("res/img/cursor.png")) {
+	
+	if (!level1BackgroundTexture.loadFromFile("res/img/level1.png")) {
 		throw std::invalid_argument("Loading error!");
 	}
+
+	if (!level2BackgroundTexture.loadFromFile("res/img/level2.png")) {
+		throw std::invalid_argument("Loading error!");
+	}
+
+	if (!playerTexture.loadFromFile("res/img/player.png")) {
+		throw std::invalid_argument("Loading error!");
+	}
+
+	if (!enemyTurretATexture.loadFromFile("res/img/turretA.png")) {
+		throw std::invalid_argument("Loading error!");
+	}
+
+	if (!playerRifleTexture.loadFromFile("res/img/playerRifle.png")) {
+		throw std::invalid_argument("Loading error!");
+	}
+
+	if (!rifleTexture.loadFromFile("res/img/rifle.png")) {
+		throw std::invalid_argument("Loading error!");
+	}
+
 }
 
 // Rescale all sprites when window resolution is changed
-void RescaleStart(RenderWindow &window) {
+void setStart() {
 	startScreenSprite.setTexture(startScreenTexture);
-	//startScreenSprite.setScale(Vector2f(float(window.getSize().x) / float(startScreenTexture.getSize().x), float(window.getSize().y) / float(startScreenTexture.getSize().y)));
-	//startScreenSprite.setScale(Vector2f(1280 / 1920.f, 720 / 1080.f));
 
 	cursorSprite.setTexture(cursorTexture);
 
-	/*startButton.setSize(Vector2f(window.getSize().x * 0.17, window.getSize().y * 0.06));
-	startButton.setPosition(window.getSize().x * 0.4, window.getSize().y * 0.55);
-	startButton.setFillColor(Color::Blue);*/
 	startButton.setSize(Vector2f(326, 65));
 	startButton.setPosition(768, 594);
 	startButton.setFillColor(Color::Blue);
 
-	/*optionsButton.setSize(Vector2f(window.getSize().x * 0.17, window.getSize().y * 0.06));
-	optionsButton.setPosition(window.getSize().x * 0.4, window.getSize().y * 0.61);
-	optionsButton.setFillColor(Color::Green);*/
 	optionsButton.setSize(Vector2f(326, 65));
 	optionsButton.setPosition(768, 659);
 	optionsButton.setFillColor(Color::Green);
 
-	/*quitButton.setSize(Vector2f(window.getSize().x * 0.17, window.getSize().y * 0.06));
-	quitButton.setPosition(window.getSize().x * 0.4, window.getSize().y * 0.67);
-	quitButton.setFillColor(Color::Red);*/
 	quitButton.setSize(Vector2f(326, 65));
 	quitButton.setPosition(768, 724);
 	quitButton.setFillColor(Color::Red);
 }
 
 // Rescales the options menu
-void RescaleOptions(RenderWindow &window) {
+void setOptions() {
 	optionsScreenSprite.setTexture(optionsScreenTexture);
-	//optionsScreenSprite.setScale(Vector2f(float(window.getSize().x) / float(startScreenTexture.getSize().x), float(window.getSize().y) / float(startScreenTexture.getSize().y)));
 
-	/*res1080Button.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
-	res1080Button.setPosition(window.getSize().x * 0.38, window.getSize().y * 0.08);
-	res1080Button.setFillColor(Color::Cyan);*/
 	res1080Button.setSize(Vector2f(420, 140));
 	res1080Button.setPosition(730, 86);
 	res1080Button.setFillColor(Color::Cyan);
 
-	/*res900Button.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
-	res900Button.setPosition(window.getSize().x * 0.38, window.getSize().y * 0.21);
-	res900Button.setFillColor(Color::Yellow);*/
 	res900Button.setSize(Vector2f(420, 140));
 	res900Button.setPosition(730, 226);
 	res900Button.setFillColor(Color::Yellow);
 
-	/*res720Button.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
-	res720Button.setPosition(window.getSize().x * 0.38, window.getSize().y * 0.34);
-	res720Button.setFillColor(Color::Red);*/
 	res720Button.setSize(Vector2f(420, 140));
 	res720Button.setPosition(730, 366);
 	res720Button.setFillColor(Color::Red);
 
-	/*resWindowedButton.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
-	resWindowedButton.setPosition(window.getSize().x * 0.38, window.getSize().y * 0.47);
-	resWindowedButton.setFillColor(Color::Blue);*/
 	resWindowedButton.setSize(Vector2f(420, 140));
 	resWindowedButton.setPosition(730, 506);
 	resWindowedButton.setFillColor(Color::Blue);
 
-	/*resFullscreenButton.setSize(Vector2f(window.getSize().x * 0.22, window.getSize().y * 0.13));
-	resFullscreenButton.setPosition(window.getSize().x * 0.38, window.getSize().y * 0.60);
-	resFullscreenButton.setFillColor(Color::Green);*/
 	resFullscreenButton.setSize(Vector2f(420, 140));
 	resFullscreenButton.setPosition(730, 646);
 	resFullscreenButton.setFillColor(Color::Green);
 
-	/*optionsBackButton.setSize(Vector2f(window.getSize().x * 0.13, window.getSize().y * 0.12));
-	optionsBackButton.setPosition(window.getSize().x * 0.42, window.getSize().y * 0.81);
-	optionsBackButton.setFillColor(Color::Magenta);*/
 	optionsBackButton.setSize(Vector2f(250, 140));
 	optionsBackButton.setPosition(805, 875);
 	optionsBackButton.setFillColor(Color::Magenta);
 }
 
-//Vector2f CurrentPlayerPosition(RenderWindow &window) {
-//	Vector2f playerPosRatio = Vector2f(float(playerSprite.getPosition().x) / window.getSize().x, float(playerSprite.getPosition().y) / window.getSize().y);
-//	//std::cout << "\n Ratio x: " << playerPosRatio.x << " \t Ratio y: " << playerPosRatio.y << " \t Window res: " << window.getSize().x << " x " << window.getSize().y << "\t x pos: " << playerSprite.getPosition().x << "\t y pos: " << playerSprite.getPosition().y;
-//	return playerPosRatio;
-//}
-//
-//void RepositionPlayer(RenderWindow &window, Vector2f playerPosRatio) {
-//	playerSprite.setPosition(Vector2f(float(window.getSize().x) * playerPosRatio.x, float(window.getSize().y) * playerPosRatio.y));
-//	//std::cout << "\n x pos = " << playerSprite.getPosition().x << " ---- y pos = " << playerSprite.getPosition().y;
-//}
+void setLevel1() {
+	level1BackgroundSprite.setTexture(level1BackgroundTexture);
 
-void RescaleLevel1(RenderWindow &window) {
-	// Set sprite textures and positons **NEEDS UPDATING**
+	// Set player sprite texture and scale
 	playerSprite.setTexture(playerTexture);
 	playerSprite.setOrigin((playerTexture.getSize().x / 2), (playerTexture.getSize().y / 2));
 	playerSprite.setScale(Vector2f(0.5f, 0.5f));
-	
-} 
+	playerSprite.setPosition(0, 480);
+
+	enemyTurretASprite.setTexture(enemyTurretATexture);
+	enemyTurretASprite.setOrigin((enemyTurretATexture.getSize().x / 2), (enemyTurretATexture.getSize().y / 2));
+	enemyTurretASprite.setScale(2.f, 2.f);
+	enemyTurretASprite.setPosition(1000, 800);
+
+	rifleSprite.setTexture(rifleTexture);
+	rifleSprite.setScale(0.75f, 0.75f);
+	rifleSprite.setPosition(-40, 920);
+
+	rifleLocation.setSize(Vector2f(120, 120));
+	rifleLocation.setPosition(0, 960);
+	rifleLocation.setFillColor(Color::Green);
+
+	level1Exit.setSize(Vector2f(10, 240));
+	level1Exit.setPosition(1910, 240);
+}
+
+void setLevel2() {
+	level2BackgroundSprite.setTexture(level2BackgroundTexture);
+
+	playerSprite.setPosition(0, 480);
+
+	enemyTurretASprite.setPosition(500, 400);
+}
 
 // Method to use time to continuously update the game
 void Update(Vector2f &mousePos, RenderWindow &window) {
   static sf::Clock clock;
   float dt = clock.restart().asSeconds();
   Vector2f move;
-	Vector2f rotate;
   if (Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) {
     move.x--;
   }
@@ -165,17 +181,34 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 	}
 
 	Vector2f playerPos = playerSprite.getPosition();
+	Vector2f turretPos = enemyTurretASprite.getPosition();
 	float ang = atan2((playerPos.y - mousePos.y), (playerPos.x - mousePos.x)) * (180 / M_PI);
 	playerSprite.setRotation(ang+180);
   playerSprite.move(move*300.f*dt);
+
+	if (rifleLocation.getGlobalBounds().contains(playerPos)) {
+		playerSprite.setTexture(playerRifleTexture);
+		playerSprite.setOrigin(56, 120);
+		rifleSprite.setPosition(-500, -500);
+	}
+
+	/*if (playerPos.x >= 1920 && playerPos.y >= 240 && playerPos.y <= 480) {
+		setLevel2();
+		RenderLevel2(window);
+	}*/
+
+	//float ang2 = atan2((turretPos.y - playerPos.y), (turretPos.x - playerPos.x)) * (180 / M_PI);
+
+	enemyTurretASprite.rotate(90.f*dt);
 
 	cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
 }
 
 // Methods to render desired game states
-void RenderLevel(RenderWindow &window) { window.draw(playerSprite), window.draw(cursorSprite); }
-void RenderStart(RenderWindow &window) { window.draw(startScreenSprite), window.draw(cursorSprite), window.draw(startButton), window.draw(optionsButton), window.draw(quitButton); }
-void RenderOptions(RenderWindow &window) { window.draw(optionsScreenSprite), window.draw(cursorSprite), window.draw(res1080Button), window.draw(res900Button), window.draw(res720Button), window.draw(resWindowedButton), window.draw(resFullscreenButton), window.draw(optionsBackButton); }
+void RenderLevel1(RenderWindow &window) { window.draw(level1BackgroundSprite), window.draw(rifleSprite), window.draw(playerSprite), window.draw(enemyTurretASprite), window.draw(cursorSprite); }
+void RenderLevel2(RenderWindow &window) { window.draw(level2BackgroundSprite), window.draw(playerSprite), window.draw(enemyTurretASprite), window.draw(cursorSprite); }
+void RenderStart(RenderWindow &window) { window.draw(startScreenSprite), window.draw(cursorSprite)/*, window.draw(startButton), window.draw(optionsButton), window.draw(quitButton)*/; }
+void RenderOptions(RenderWindow &window) { window.draw(optionsScreenSprite), window.draw(cursorSprite)/*, window.draw(res1080Button), window.draw(res900Button), window.draw(res720Button), window.draw(resWindowedButton), window.draw(resFullscreenButton), window.draw(optionsBackButton)*/; }
 
 int main() {
   
@@ -200,7 +233,7 @@ int main() {
 	// Game running while loop
   while (window.isOpen()) {
 		window.setMouseCursorVisible(false);
-		Vector2f playerPosRatio;
+		Vector2f playerPos;
 		Vector2f mousePos;
 
 
@@ -208,7 +241,7 @@ int main() {
 		switch (gameState) {
 			case GameStates::START:
 				window.clear();
-				RescaleStart(window);
+				setStart();
 				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
 				Update(Vector2f(mousePos.x, mousePos.y), window);
 				RenderStart(window);
@@ -222,6 +255,7 @@ int main() {
 					else if (startEvent.type == Event::MouseButtonPressed) {
 						// If start button is clicked, go to LEVEL_1 game state
 						if (startButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+							setLevel1();
 							gameState = GameStates::LEVEL_1;
 							lastGameState = gameState;
 						}
@@ -254,13 +288,11 @@ int main() {
 
 			case GameStates::OPTIONS:
 				window.clear();
-				RescaleOptions(window);
+				setOptions();
 				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
-				Update(Vector2f(mousePos.x, mousePos.y), window);
+				cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
 				RenderOptions(window);
 				window.display();
-
-				//playerPosRatio = CurrentPlayerPosition(window);
 
 				Event optionsEvent;
 				while (window.pollEvent(optionsEvent)) {
@@ -272,28 +304,22 @@ int main() {
 						if (res1080Button.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							window.create(sf::VideoMode(1920, 1080), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
 							window.setView(view);
-							//RepositionPlayer(window, playerPosRatio);
-
 						}
 						else if (res900Button.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							window.create(sf::VideoMode(1600, 900), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
-							//RepositionPlayer(window, playerPosRatio);
 							window.setView(view);
 						}
 						else if (res720Button.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							window.create(sf::VideoMode(1280, 720), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
 							window.setView(view);
-							//RepositionPlayer(window, playerPosRatio);
 						}
 						else if (resWindowedButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							window.create(sf::VideoMode(window.getSize().x, window.getSize().y), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
 							window.setView(view);
-							//RepositionPlayer(window, playerPosRatio);
 						}
 						else if (resFullscreenButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							window.create(sf::VideoMode(window.getSize().x, window.getSize().y), "Hotline Scunthorpe", Style::Fullscreen);
 							window.setView(view);
-							//RepositionPlayer(window, playerPosRatio);
 						}
 
 						else if (optionsBackButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
@@ -305,10 +331,10 @@ int main() {
 
 			case GameStates::LEVEL_1:
 				window.clear();
-				RescaleLevel1(window);
 				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+				playerPos = playerSprite.getPosition();
 				Update(Vector2f(mousePos.x, mousePos.y), window);
-				RenderLevel(window);
+				RenderLevel1(window);
 				window.display();
 				Event level1Event;
 				while (window.pollEvent(level1Event)) {
@@ -319,16 +345,33 @@ int main() {
 						if (level1Event.key.code == Keyboard::Escape) {
 							gameState = GameStates::OPTIONS;
 						}
+						else if (level1Exit.getGlobalBounds().contains(playerPos)) {
+							setLevel2();
+							gameState = GameStates::LEVEL_2;
+							lastGameState = gameState;
+						}
+					}
+				}
+				break;
+			case GameStates::LEVEL_2:
+				window.clear();
+				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+				Update(Vector2f(mousePos.x, mousePos.y), window);
+				RenderLevel2(window);
+				window.display();
+				Event level2Event;
+				while (window.pollEvent(level2Event)) {
+					if (level2Event.type == Event::Closed) {
+						window.close();
+					}
+					else if (level2Event.type == Event::KeyPressed) {
+						if (level2Event.key.code == Keyboard::Escape) {
+							gameState = GameStates::OPTIONS;
+						}
 					}
 				}
 				break;
 		}
-
-
-    /*window.clear();
-    Update();
-    Render(window);
-    window.display();*/
   }
 
   return 0;
