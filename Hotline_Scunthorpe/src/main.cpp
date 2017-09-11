@@ -23,6 +23,8 @@ Texture enemyTurretATexture;
 Sprite enemyTurretASprite;
 Texture rifleTexture;
 Sprite rifleSprite;
+Texture bulletTexture;
+Sprite bulletSprite;
 
 RectangleShape startButton;
 RectangleShape optionsButton;
@@ -35,6 +37,10 @@ RectangleShape resFullscreenButton;
 RectangleShape optionsBackButton;
 RectangleShape rifleLocation;
 RectangleShape level1Exit;
+
+RectangleShape test;
+
+bool isShooting = false;
 
 // The different states of the game
 enum class GameStates { START, MENU, OPTIONS, LEVEL_1, LEVEL_2 };
@@ -77,8 +83,46 @@ void Load() {
 	if (!rifleTexture.loadFromFile("res/img/rifle.png")) {
 		throw std::invalid_argument("Loading error!");
 	}
+	if (!bulletTexture.loadFromFile("res/img/bullet.png")) {
+		throw std::invalid_argument("Loading error!");
+	}
 
 }
+
+class Bullet {
+public:
+	Bullet(Vector2f size) {
+		bullet.setSize(size);
+	}
+
+	void setTex() {
+		Texture bulletTexture;
+		if (!bulletTexture.loadFromFile("res/img/bullet.png")) {
+			throw std::invalid_argument("Loading error!");
+		}
+		bullet.setTexture(&bulletTexture);
+	}
+	void speed(Vector2f speed) {
+		bullet.move(speed);
+		std::cout << "\t speed x = " << speed.x << "\t speed y = " << speed.y;
+	}
+	void draw(RenderWindow &window) {
+		window.draw(bullet);
+	}
+	void setPos(Vector2f newPos) {
+		bullet.setPosition(newPos);
+	}
+	void setRot(float ang) {
+		bullet.setRotation(ang);
+	}
+	float getRot() {
+		return bullet.getRotation();
+	}
+private:
+	RectangleShape bullet;
+};
+
+std::vector<Bullet> bulletList;
 
 // Rescale all sprites when window resolution is changed
 void setStart() {
@@ -150,6 +194,10 @@ void setLevel1() {
 	rifleLocation.setPosition(0, 960);
 	rifleLocation.setFillColor(Color::Green);
 
+	//bulletSprite.setTexture(bulletTexture);
+	//bulletSprite.setPosition(-256, -256);
+	//bulletSprite.setOrigin((bulletTexture.getSize().x / 2), (bulletTexture.getSize().y / 2));
+
 	level1Exit.setSize(Vector2f(10, 240));
 	level1Exit.setPosition(1910, 240);
 }
@@ -167,6 +215,20 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
   static sf::Clock clock;
   float dt = clock.restart().asSeconds();
   Vector2f move;
+	Vector2f playerPos = playerSprite.getPosition();
+	Vector2f turretPos = enemyTurretASprite.getPosition();
+	if (isShooting == true) {
+		Bullet newBullet(Vector2f(132, 9));
+		newBullet.setTex();
+		newBullet.setPos(playerPos);
+		newBullet.setRot(playerSprite.getRotation());
+		bulletList.push_back(newBullet);
+		isShooting = false;
+	}
+	for (int i = 0; i < bulletList.size(); i++) {
+		bulletList[i].draw(window);
+		bulletList[i].speed(Vector2f(2000 * dt * cos(bulletList[i].getRot() * (M_PI / 180)), 2000 * dt * sin(bulletList[i].getRot() * (M_PI / 180))));
+	}
   if (Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) {
     move.x--;
   }
@@ -180,11 +242,17 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 		move.y++;
 	}
 
-	Vector2f playerPos = playerSprite.getPosition();
-	Vector2f turretPos = enemyTurretASprite.getPosition();
 	float ang = atan2((playerPos.y - mousePos.y), (playerPos.x - mousePos.x)) * (180 / M_PI);
 	playerSprite.setRotation(ang+180);
   playerSprite.move(move*300.f*dt);
+
+	if (Mouse::isButtonPressed(Mouse::Left)) {
+		//bulletSprite.setPosition(playerPos.x, playerPos.y);
+		//bulletSprite.setRotation(playerSprite.getRotation());
+		isShooting = true;
+	}
+
+	bulletSprite.move(2000 * dt * cos(bulletSprite.getRotation()*(M_PI / 180)), 2000 * dt * sin(bulletSprite.getRotation()*(M_PI / 180)));
 
 	if (rifleLocation.getGlobalBounds().contains(playerPos)) {
 		playerSprite.setTexture(playerRifleTexture);
@@ -205,7 +273,7 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 }
 
 // Methods to render desired game states
-void RenderLevel1(RenderWindow &window) { window.draw(level1BackgroundSprite), window.draw(rifleSprite), window.draw(playerSprite), window.draw(enemyTurretASprite), window.draw(cursorSprite); }
+void RenderLevel1(RenderWindow &window) { window.draw(level1BackgroundSprite), window.draw(rifleSprite), /*window.draw(bulletSprite),*/ window.draw(playerSprite), window.draw(enemyTurretASprite), window.draw(cursorSprite); }
 void RenderLevel2(RenderWindow &window) { window.draw(level2BackgroundSprite), window.draw(playerSprite), window.draw(enemyTurretASprite), window.draw(cursorSprite); }
 void RenderStart(RenderWindow &window) { window.draw(startScreenSprite), window.draw(cursorSprite)/*, window.draw(startButton), window.draw(optionsButton), window.draw(quitButton)*/; }
 void RenderOptions(RenderWindow &window) { window.draw(optionsScreenSprite), window.draw(cursorSprite)/*, window.draw(res1080Button), window.draw(res900Button), window.draw(res720Button), window.draw(resWindowedButton), window.draw(resFullscreenButton), window.draw(optionsBackButton)*/; }
@@ -229,6 +297,9 @@ int main() {
     std::cerr << "Load error" << std::endl;
     return 1;
   }
+
+	/*std::vector<Bullet> bulletList;
+	bool isShooting = false;*/
 
 	// Game running while loop
   while (window.isOpen()) {
@@ -333,8 +404,18 @@ int main() {
 				window.clear();
 				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
 				playerPos = playerSprite.getPosition();
-				Update(Vector2f(mousePos.x, mousePos.y), window);
+				/*if (isShooting == true) {
+					Bullet newBullet(Vector2f(132, 9), bulletTexture);
+					newBullet.setPos(playerPos);
+					bulletList.push_back(newBullet);
+					isShooting = false;
+				}
+				for (int i = 0; i < bulletList.size(); i++) {
+					bulletList[i].draw(window);
+					bulletList[i].speed(1);
+				}*/
 				RenderLevel1(window);
+				Update(Vector2f(mousePos.x, mousePos.y), window);
 				window.display();
 				Event level1Event;
 				while (window.pollEvent(level1Event)) {
@@ -351,6 +432,9 @@ int main() {
 							lastGameState = gameState;
 						}
 					}
+					/*else if (level1Event.type == Event::MouseButtonPressed) {
+						isShooting = true;
+					}*/
 				}
 				break;
 			case GameStates::LEVEL_2:
