@@ -31,6 +31,8 @@ RectangleShape res1080Button, res900Button, res720Button, resWindowedButton, res
 Text highScoresText;
 // Level 1 rects
 RectangleShape rifleLocation, level1Exit;
+// level 2 rects
+RectangleShape level2Exit;
 // Game over score text
 Font alienFont;
 Text scoreText;
@@ -380,26 +382,42 @@ void setLevel1() {
 void setLevel2() {
 	level2BackgroundSprite.setTexture(level2BackgroundTexture);
 
-	playerSprite.setPosition(0, 480);
+	playerSprite.setPosition(0, 360);
+
+	Enemy enemyA1(Vector2f(186, 78));
+	enemyA1.setType(1);
+	enemyA1.setTex(enemyTurretATexture);
+	enemyA1.setPos(600, 180);
+	enemyA1.setRot(90);
+	enemyA1.setOrigin(Vector2f(56, 39));
+	enemyList.push_back(enemyA1);
+
+	Enemy enemyA2(Vector2f(186, 78));
+	enemyA2.setType(1);
+	enemyA2.setTex(enemyTurretATexture);
+	enemyA2.setPos(1560, 900);
+	enemyA2.setRot(180);
+	enemyA2.setOrigin(Vector2f(56, 39));
+	enemyList.push_back(enemyA2);
 
 	Enemy enemyBase1(Vector2f(192, 192));
 	enemyBase1.setType(0);
 	enemyBase1.setTex(enemyTurretBaseTexture);
-	enemyBase1.setPos(1020, 900);
+	enemyBase1.setPos(1640, 360);
 	enemyBase1.setOrigin(Vector2f(96, 96));
 	enemyList.push_back(enemyBase1);
 
 	Enemy enemyBase2(Vector2f(192, 192));
 	enemyBase2.setType(0);
 	enemyBase2.setTex(enemyTurretBaseTexture);
-	enemyBase2.setPos(1500, 960);
+	enemyBase2.setPos(840, 900);
 	enemyBase2.setOrigin(Vector2f(96, 96));
 	enemyList.push_back(enemyBase2);
 
 	Enemy enemyB1(Vector2f(256, 256));
 	enemyB1.setType(2);
 	enemyB1.setTex(enemyTurretBTexture);
-	enemyB1.setPos(1020, 900);
+	enemyB1.setPos(1640, 360);
 	enemyB1.setRot(0);
 	enemyB1.setOrigin(Vector2f(128, 128));
 	enemyList.push_back(enemyB1);
@@ -407,10 +425,13 @@ void setLevel2() {
 	Enemy enemyB2(Vector2f(256, 256));
 	enemyB2.setType(2);
 	enemyB2.setTex(enemyTurretBTexture);
-	enemyB2.setPos(1500, 960);
+	enemyB2.setPos(840, 900);
 	enemyB2.setRot(90);
 	enemyB2.setOrigin(Vector2f(128, 128));
 	enemyList.push_back(enemyB2);
+
+	level2Exit.setSize(Vector2f(240, 10));
+	level2Exit.setPosition(240, 1070);
 
 }
 
@@ -586,6 +607,10 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 		setLevel2();
 		gameState = GameStates::LEVEL_2;
 		lastGameState = gameState;
+	}
+
+	if (level2Exit.getGlobalBounds().contains(playerPos) && gameState == GameStates::LEVEL_2) {
+		gameState = GameStates::START;
 	}
 
 	cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
