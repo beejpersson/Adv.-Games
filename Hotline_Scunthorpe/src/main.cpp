@@ -1,9 +1,11 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include <stdexcept>
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include <list>
+#include <vector>
+#include <algorithm>
 
 using namespace sf;
 
@@ -17,6 +19,8 @@ Texture highScoresScreenTexture;
 Sprite highScoresSprite;
 Texture optionsScreenTexture;
 Sprite optionsScreenSprite;
+Texture creditsScreenTexture;
+Sprite creditsScreenSprite;
 Texture level1BackgroundTexture, level2BackgroundTexture, playerTexture, playerRifleTexture, enemyTurretBaseTexture, enemyTurretATexture, enemyTurretBTexture, rifleTexture, bulletTexture;
 Sprite level1BackgroundSprite, level2BackgroundSprite, playerSprite, enemyTurretBaseSprite, enemyTurretASprite, enemyTurretBSprite, rifleSprite, bulletSprite;
 Texture gameOverTexture;
@@ -24,11 +28,11 @@ Sprite gameOverSprite;
 
 
 // Start screen buttons
-RectangleShape startButton, optionsButton, quitButton, highScoresButton;
+RectangleShape startButton, optionsButton, quitButton, highScoresButton, creditsButton;
 // Options screen buttons
 RectangleShape res1080Button, res900Button, res720Button, resWindowedButton, resFullscreenButton, optionsBackButton;
 //Highscores screen text
-Text highScoresText;
+Text scoreTitle;
 // Level 1 rects
 RectangleShape rifleLocation, level1Exit;
 // level 2 rects
@@ -36,6 +40,10 @@ RectangleShape level2Exit;
 // Game over score text
 Font alienFont;
 Text scoreText;
+
+// Sounds
+SoundBuffer buzzBuffer, gunCockBuffer, gunShotBuffer, pistolBuffer, rifleBuffer, turretDeathBuffer, playerDeathBuffer, winBuffer;
+Sound turretGunSound, gunSounds, turretDeathSound, buzzSound, playerDeathSound, gunCockSound, winSound;
 
 // Start screen timer
 int startTimer = 0;
@@ -54,7 +62,7 @@ bool isEnemyTurretAShooting = false;
 bool isEnemyTurretBShooting = false;
 
 // Scoring
-std::list<int> scoreList;
+std::vector<int> scoreList;
 int currentScore;
 int printableScore;
 
@@ -86,6 +94,10 @@ void Load() {
 	}
 
 	if (!optionsScreenTexture.loadFromFile("res/img/options.png")) {
+		throw std::invalid_argument("Loading error!");
+	}
+
+	if (!creditsScreenTexture.loadFromFile("res/img/credits.png")) {
 		throw std::invalid_argument("Loading error!");
 	}
 	
@@ -132,6 +144,47 @@ void Load() {
 	{
 		throw std::invalid_argument("Loading error!");
 	}
+
+	if (!gunCockBuffer.loadFromFile("res/sound/GunCock.wav"))
+	{
+		throw std::invalid_argument("Loading error!");
+	}
+
+	if (!gunShotBuffer.loadFromFile("res/sound/GunShot.wav"))
+	{
+		throw std::invalid_argument("Loading error!");
+	}
+
+	if (!buzzBuffer.loadFromFile("res/sound/buzz.wav"))
+	{
+		throw std::invalid_argument("Loading error!");
+	}
+
+	if (!pistolBuffer.loadFromFile("res/sound/pistol.wav"))
+	{
+		throw std::invalid_argument("Loading error!");
+	}
+
+	if (!rifleBuffer.loadFromFile("res/sound/rifle.wav"))
+	{
+		throw std::invalid_argument("Loading error!");
+	}
+
+	if (!turretDeathBuffer.loadFromFile("res/sound/turretDeath.wav"))
+	{
+		throw std::invalid_argument("Loading error!");
+	}
+
+	if (!playerDeathBuffer.loadFromFile("res/sound/playerDeath.wav"))
+	{
+		throw std::invalid_argument("Loading error!");
+	}
+
+	if (!winBuffer.loadFromFile("res/sound/win.wav"))
+	{
+		throw std::invalid_argument("Loading error!");
+	}
+
 
 }
 
@@ -271,13 +324,18 @@ void setStart() {
 	optionsButton.setPosition(760, 600);
 	optionsButton.setFillColor(Color::Green);
 
+	creditsButton.setSize(Vector2f(420, 120));
+	creditsButton.setPosition(760, 740);
+	creditsButton.setFillColor(Color::Magenta);
+
 	quitButton.setSize(Vector2f(420, 120));
-	quitButton.setPosition(760, 860);
+	quitButton.setPosition(760, 880);
 	quitButton.setFillColor(Color::Red);
+
 
 	highScoresButton.setSize(Vector2f(380, 240));
 	highScoresButton.setPosition(1380, 680);	
-	highScoresButton.setFillColor(Color::Green);
+	highScoresButton.setFillColor(Color::Cyan);
 }
 
 // Set the highscore screen
@@ -285,16 +343,74 @@ void setHighScores() {
 	highScoresSprite.setTexture(highScoresScreenTexture);
 
 	optionsBackButton.setSize(Vector2f(250, 140));
-	optionsBackButton.setPosition(805, 875);
+	optionsBackButton.setPosition(805, 930);
 	optionsBackButton.setFillColor(Color::Magenta);
 
-	//sort(scoreList.begin(), scoreList.end());
+	scoreTitle.setFont(alienFont);
+	scoreTitle.setCharacterSize(48);
+	scoreTitle.setColor(Color::Magenta);
+	scoreTitle.setPosition(900, 400);
+}
 
-	highScoresText.setFont(alienFont);
-//	highScoresText.setString(std::to_string(scoreList));
-	highScoresText.setPosition(500, 420);
-	highScoresText.setCharacterSize(108);
-	highScoresText.setColor(Color::Cyan);
+void drawScoreList(RenderWindow &window) {
+
+
+	sort(scoreList.begin(), scoreList.end());
+	reverse(scoreList.begin(), scoreList.end());
+
+	for (int i = 0; i < scoreList.size(); i++) {
+		Text highScoresText;
+		Text positionText;
+		highScoresText.setFont(alienFont);
+		positionText.setFont(alienFont);
+		highScoresText.setCharacterSize(48);
+		positionText.setCharacterSize(48);
+		highScoresText.setColor(Color::Cyan);
+		positionText.setColor(Color::Magenta);
+		highScoresText.setString(std::to_string(scoreList[i]));
+		positionText.setString(std::to_string(i + 1) + ".");
+
+		if (scoreList.size() > 20) {
+			if (i > 19) {
+				highScoresText.setPosition(1600, 300 + (60 * (i - 20)));
+				positionText.setPosition(1300, 300 + (60 * (i - 20)));
+			}
+			else if (i > 9) {
+				highScoresText.setPosition(1100, 300 + (60 * (i - 10)));
+				positionText.setPosition(800, 300 + (60 * (i - 10)));
+			}
+			else {
+				highScoresText.setPosition(600, 300 + (60 * i));
+				positionText.setPosition(300, 300 + (60 * i));
+			}
+		}
+
+		else if (scoreList.size() > 10) {
+			if (i > 9) {
+				highScoresText.setPosition(1400, 300 + (60 * (i - 10)));
+				positionText.setPosition(1100, 300 + (60 * (i - 10)));
+			}
+			else {
+				highScoresText.setPosition(800, 300 + (60 * i));
+				positionText.setPosition(500, 300 + (60 * i));
+			}
+		}
+		else {
+			highScoresText.setPosition(1100, 300 + (60 * i));
+			positionText.setPosition(800, 300 + (60 * i));
+		}
+
+		window.draw(highScoresText);
+		window.draw(positionText);
+	}
+}
+
+void setCredits() {
+	creditsScreenSprite.setTexture(creditsScreenTexture);
+
+	optionsBackButton.setSize(Vector2f(250, 140));
+	optionsBackButton.setPosition(820, 930);
+	optionsBackButton.setFillColor(Color::Magenta);
 }
 
 // Rescales the options menu
@@ -327,11 +443,15 @@ void setOptions() {
 }
 
 void setLevel1() {
+	playerFiringRate = 10;
+	gunCockSound.setBuffer(gunCockBuffer);
+	gunCockSound.setVolume(30);
+	gunCockSound.play();
 	level1BackgroundSprite.setTexture(level1BackgroundTexture);
 
 	// Set player sprite texture and scale
 	playerSprite.setTexture(playerTexture);
-	playerSprite.setOrigin((playerTexture.getSize().x / 2), (playerTexture.getSize().y / 2));
+	playerSprite.setOrigin(60, 80);
 	playerSprite.setScale(Vector2f(0.5f, 0.5f));
 	playerSprite.setPosition(0, 480);
 
@@ -380,6 +500,9 @@ void setLevel1() {
 }
 
 void setLevel2() {
+	gunCockSound.setBuffer(gunCockBuffer);
+	gunCockSound.setVolume(30);
+	gunCockSound.play();
 	level2BackgroundSprite.setTexture(level2BackgroundTexture);
 
 	playerSprite.setPosition(0, 360);
@@ -460,9 +583,13 @@ void UpdateStart(Vector2f &mousePos, RenderWindow &window) {
 	startTimer += (60 * dt);
 
 	if (startTimer > startRate) {
+		buzzSound.setBuffer(buzzBuffer);
+		buzzSound.setVolume(10);
+		buzzSound.play();
 		startScreenSprite.setTexture(startScreen2Texture);
 		window.draw(startScreenSprite);
-		if (startTimer > startRate+10) {
+		if (startTimer > startRate+5) {
+			buzzSound.stop();
 			startScreenSprite.setTexture(startScreenTexture);
 			window.draw(startScreenSprite);
 			startTimer = 0;
@@ -484,6 +611,16 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 	firingTimer += (60 * dt);
 
 	if (isShooting == true) {
+		if (playerFiringRate == 5) {
+			gunSounds.setBuffer(rifleBuffer);
+			gunSounds.setVolume(10);
+			gunSounds.play();
+		}
+		else if (playerFiringRate == 10) {
+			gunSounds.setBuffer(pistolBuffer);
+			gunSounds.setVolume(10);
+			gunSounds.play();
+		}
 		Bullet newBullet(Vector2f(132, 9));
 		newBullet.setTex(bulletTexture);
 		newBullet.setPos(playerPos.x, playerPos.y);
@@ -501,7 +638,9 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 		for (int j = 0; j < playerBulletList.size(); j++) {
 			if (enemyList[i].checkCollision(playerBulletList[j])) {
 				currentScore++;
-				std::cout << "\nscore = " << currentScore;
+				turretDeathSound.setBuffer(turretDeathBuffer);
+				turretDeathSound.setVolume(10);
+				turretDeathSound.play();
 			}
 		}
 		if (enemyList[i].getTimer() > enemyTurretAFiringRate && enemyList[i].getType() == 1 && enemyList[i].getPos().x > 0) {
@@ -514,6 +653,9 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 		}
 
 		if (isEnemyTurretAShooting == true) {
+			turretGunSound.setBuffer(gunShotBuffer);
+			turretGunSound.setVolume(10);
+			turretGunSound.play();
 			Bullet newBullet(Vector2f(132, 9));
 			newBullet.setTex(bulletTexture);
 			newBullet.setPos(enemyList[i].getPos().x, enemyList[i].getPos().y);
@@ -523,6 +665,9 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 		}
 
 		if (isEnemyTurretBShooting == true) {
+			turretGunSound.setBuffer(gunShotBuffer);
+			turretGunSound.setVolume(10);
+			turretGunSound.play();
 			Bullet firstBullet(Vector2f(132, 9));
 			firstBullet.setTex(bulletTexture);
 			firstBullet.setPos(enemyList[i].getPos().x, enemyList[i].getPos().y);
@@ -566,6 +711,9 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 			enemyBulletList[i].draw(window);
 		}
 		if (enemyBulletList[i].getBounds().intersects(playerSprite.getGlobalBounds())) {
+			playerDeathSound.setBuffer(playerDeathBuffer);
+			playerDeathSound.setVolume(30);
+			playerDeathSound.play();
 			enemyList.clear();
 			scoreList.push_back(currentScore);
 			printableScore = currentScore;
@@ -598,18 +746,30 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 
 	if (rifleLocation.getGlobalBounds().contains(playerPos)) {
 		playerSprite.setTexture(playerRifleTexture);
-		playerSprite.setOrigin(56, 120);
+		playerSprite.setOrigin(56, 82);
 		rifleSprite.setPosition(-500, -500);
 		playerFiringRate = 5;
 	}
 
   if (level1Exit.getGlobalBounds().contains(playerPos) && gameState == GameStates::LEVEL_1) {
+		enemyList.clear();
+		playerBulletList.clear();
+		enemyBulletList.clear();
 		setLevel2();
 		gameState = GameStates::LEVEL_2;
 		lastGameState = gameState;
 	}
 
 	if (level2Exit.getGlobalBounds().contains(playerPos) && gameState == GameStates::LEVEL_2) {
+		winSound.setBuffer(winBuffer);
+		winSound.setVolume(30);
+		winSound.play();
+		enemyList.clear();
+		playerBulletList.clear();
+		enemyBulletList.clear();
+		scoreList.push_back(currentScore);
+		printableScore = currentScore;
+		currentScore = 0;
 		gameState = GameStates::START;
 	}
 
@@ -619,10 +779,11 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 // Methods to render desired game states
 void RenderLevel1(RenderWindow &window) { window.draw(level1BackgroundSprite), window.draw(rifleSprite), window.draw(playerSprite), window.draw(cursorSprite); }
 void RenderLevel2(RenderWindow &window) { window.draw(level2BackgroundSprite), window.draw(playerSprite), window.draw(cursorSprite); }
-void RenderStart(RenderWindow &window) { window.draw(startScreenSprite), window.draw(cursorSprite)/*,window.draw(startButton), window.draw(optionsButton), window.draw(quitButton)*/; }
-void RenderOptions(RenderWindow &window) { window.draw(optionsScreenSprite), window.draw(cursorSprite)/*, window.draw(res1080Button), window.draw(res900Button), window.draw(res720Button), window.draw(resWindowedButton), window.draw(resFullscreenButton),window.draw(optionsBackButton)*/; }
-void RenderGameOver(RenderWindow &window) { window.draw(gameOverSprite), window.draw(cursorSprite), window.draw(scoreText)/*, window.draw(res1080Button), window.draw(res900Button), window.draw(res720Button), window.draw(resWindowedButton), window.draw(resFullscreenButton), window.draw(optionsBackButton), window.draw(quitButton)*/; }
-void RenderScores(RenderWindow &window) { window.draw(highScoresSprite), window.draw(cursorSprite), window.draw(highScoresText); }
+void RenderStart(RenderWindow &window) { window.draw(startScreenSprite), window.draw(cursorSprite); }
+void RenderOptions(RenderWindow &window) { window.draw(optionsScreenSprite), window.draw(cursorSprite); }
+void RenderGameOver(RenderWindow &window) { window.draw(gameOverSprite), window.draw(cursorSprite), window.draw(scoreText); }
+void RenderScores(RenderWindow &window) { window.draw(highScoresSprite), window.draw(cursorSprite); }
+void RenderCredits(RenderWindow &window) { window.draw(creditsScreenSprite), window.draw(cursorSprite); }
 
 int main() {
   
@@ -638,9 +799,6 @@ int main() {
     std::cerr << "Load error" << std::endl;
     return 1;
   }
-
-	/*std::vector<Bullet> bulletList;
-	bool isShooting = false;*/
 
 	startScreenSprite.setTexture(startScreenTexture);
 
@@ -677,6 +835,10 @@ int main() {
 						else if (optionsButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							gameState = GameStates::OPTIONS;
 						}
+						// If credits button is clicked, show credits
+						else if (creditsButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+							gameState = GameStates::CREDITS;
+						}
 						// If highscore button is clicked, show high scores
 						else if (highScoresButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							gameState = GameStates::SCORES;
@@ -687,10 +849,6 @@ int main() {
 						}
 					}
 					else if (startEvent.type == Event::KeyPressed) {
-						/*if (startEvent.key.code == Keyboard::P) {
-							window.create(VideoMode(640, 480), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
-							window.setView(view);
-						}*/
 						if (startEvent.key.code == Keyboard::Escape) {
 							window.close();
 						}
@@ -707,6 +865,7 @@ int main() {
 				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
 				cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
 				RenderScores(window);
+				drawScoreList(window);
 				window.display();
 				Event scoresEvent;
 				while (window.pollEvent(scoresEvent)) {
@@ -714,6 +873,27 @@ int main() {
 						window.close();
 					}
 					else if (scoresEvent.type == Event::MouseButtonPressed) {
+						// Choose resolution and windowed or fullscreen
+						if (optionsBackButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+							gameState = GameStates::START;
+							lastGameState = gameState;
+						}
+					}
+				}
+				break;
+			case GameStates::CREDITS:
+				window.clear();
+				setCredits();
+				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+				cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
+				RenderCredits(window);
+				window.display();
+				Event creditsEvent;
+				while (window.pollEvent(creditsEvent)) {
+					if (creditsEvent.type == Event::Closed) {
+						window.close();
+					}
+					else if (creditsEvent.type == Event::MouseButtonPressed) {
 						// Choose resolution and windowed or fullscreen
 						if (optionsBackButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
 							gameState = GameStates::START;
