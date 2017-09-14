@@ -596,7 +596,47 @@ void UpdateStart(Vector2f &mousePos, RenderWindow &window) {
 		}
 	}
 
-	cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
+	if (Joystick::isConnected(0)) {
+		if (Joystick::getAxisPosition(0, Joystick::U) > 30) {
+			cursorSprite.move(500.f * dt, 0);
+		}
+		if (Joystick::getAxisPosition(0, Joystick::U) < -30) {
+			cursorSprite.move(-500.f * dt, 0);
+		}
+		if (Joystick::getAxisPosition(0, Joystick::R) > 30) {
+			cursorSprite.move(0, 500.f * dt);
+		}
+		if (Joystick::getAxisPosition(0, Joystick::R) < -30) {
+			cursorSprite.move(0, -500.f * dt);
+		}
+	}
+	else {
+		cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
+	}
+}
+
+void UpdateMenus(Vector2f &mousePos, RenderWindow &window) {
+	static sf::Clock clock;
+	float dt = clock.restart().asSeconds();
+	window.setFramerateLimit(60);
+
+	if (Joystick::isConnected(0)) {
+		if (Joystick::getAxisPosition(0, Joystick::U) > 30) {
+			cursorSprite.move(500.f * dt, 0);
+		}
+		if (Joystick::getAxisPosition(0, Joystick::U) < -30) {
+			cursorSprite.move(-500.f * dt, 0);
+		}
+		if (Joystick::getAxisPosition(0, Joystick::R) > 30) {
+			cursorSprite.move(0, 500.f * dt);
+		}
+		if (Joystick::getAxisPosition(0, Joystick::R) < -30) {
+			cursorSprite.move(0, -500.f * dt);
+		}
+	}
+	else {
+		cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
+	}
 }
 
 // Method to use time to continuously update the game levels
@@ -604,7 +644,7 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
   static sf::Clock clock;
   float dt = clock.restart().asSeconds();
 	window.setFramerateLimit(60);
-  Vector2f move;
+	Vector2f move;
 	Vector2f playerPos = playerSprite.getPosition();
 	Vector2f turretPos = enemyTurretASprite.getPosition();
 
@@ -636,7 +676,7 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 		enemyList[i].draw(window);
 		enemyList[i].incrementTimer(60 * dt);
 		for (int j = 0; j < playerBulletList.size(); j++) {
-			if (enemyList[i].checkCollision(playerBulletList[j])) {
+			if (enemyList[i].getPos().x > 0 && enemyList[i].checkCollision(playerBulletList[j])) {
 				currentScore++;
 				turretDeathSound.setBuffer(turretDeathBuffer);
 				turretDeathSound.setVolume(10);
@@ -718,6 +758,7 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 			scoreList.push_back(currentScore);
 			printableScore = currentScore;
 			currentScore = 0;
+			cursorSprite.setPosition(960, 540);
 			gameState = GameStates::GAME_OVER;
 		}
 	}
@@ -735,8 +776,36 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 		move.y++;
 	}
 
-	float ang = atan2((playerPos.y - mousePos.y), (playerPos.x - mousePos.x)) * (180 / M_PI);
-	playerSprite.setRotation(ang+180);
+	if (Joystick::isConnected(0)) {
+		if (Joystick::getAxisPosition(0, Joystick::X) > 30) {
+			move.x++;
+		}
+		if (Joystick::getAxisPosition(0, Joystick::X) < -30) {
+			move.x--;
+		}
+		if (Joystick::getAxisPosition(0, Joystick::Y) > 30) {
+			move.y++;
+		}
+		if (Joystick::getAxisPosition(0, Joystick::Y) < -30) {
+			move.y--;
+		}
+		if (Joystick::getAxisPosition(0, Joystick::Z) < -30 && firingTimer > playerFiringRate || Joystick::isButtonPressed(0, 0) && firingTimer > playerFiringRate) {
+			firingTimer = 0;
+			isShooting = true;
+		}
+		if (Joystick::getAxisPosition(0, Joystick::R) > 30 || Joystick::getAxisPosition(0, Joystick::R) < -30 || Joystick::getAxisPosition(0, Joystick::U) < -30 || Joystick::getAxisPosition(0, Joystick::U) > 30) {
+			float ang = atan2(Joystick::getAxisPosition(0, Joystick::R), (Joystick::getAxisPosition(0, Joystick::U))) * (180 / M_PI);
+			playerSprite.setRotation(ang);
+			cursorSprite.setPosition(playerPos.x + (500 * cos(ang * M_PI / 180)), playerPos.y + (500 * sin(ang * M_PI / 180)));
+		}
+
+	}
+
+	if (!Joystick::isConnected(0)) {
+		float ang = atan2((playerPos.y - mousePos.y), (playerPos.x - mousePos.x)) * (180 / M_PI);
+		playerSprite.setRotation(ang + 180);
+		cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
+	}
   playerSprite.move(move*300.f*dt);
 
 	if (Mouse::isButtonPressed(Mouse::Left) && firingTimer > playerFiringRate) {
@@ -770,10 +839,10 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 		scoreList.push_back(currentScore);
 		printableScore = currentScore;
 		currentScore = 0;
+		cursorSprite.setPosition(960, 540);
 		gameState = GameStates::START;
 	}
-
-	cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
+	
 }
 
 // Methods to render desired game states
@@ -854,8 +923,28 @@ int main() {
 						}
 					}
 				}
-				if (Keyboard::isKeyPressed(Keyboard::Space)) {
+				if (startButton.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)) {
+					sleep(milliseconds(200));
+					setLevel1();
 					gameState = GameStates::LEVEL_1;
+					lastGameState = gameState;
+				}
+				else if (optionsButton.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)) {
+					sleep(milliseconds(200));
+					gameState = GameStates::OPTIONS;
+				}
+				else if (creditsButton.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)) {
+					sleep(milliseconds(200));
+					gameState = GameStates::CREDITS;
+				}
+				else if (highScoresButton.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)) {
+					sleep(milliseconds(200));
+					gameState = GameStates::SCORES;
+				}
+				else if (quitButton.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)
+					|| Joystick::isButtonPressed(0, 1)) {
+					sleep(milliseconds(200));
+					window.close();
 				}
 				break;
 				
@@ -863,7 +952,7 @@ int main() {
 				window.clear();
 				setHighScores();
 				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
-				cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
+				UpdateMenus(mousePos, window);
 				RenderScores(window);
 				drawScoreList(window);
 				window.display();
@@ -880,12 +969,18 @@ int main() {
 						}
 					}
 				}
+			  if (optionsBackButton.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0) 
+						|| Joystick::isButtonPressed(0,1)) {
+					sleep(milliseconds(200));
+					gameState = GameStates::START;
+					lastGameState = gameState;
+				}
 				break;
 			case GameStates::CREDITS:
 				window.clear();
 				setCredits();
 				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
-				cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
+				UpdateMenus(mousePos, window);
 				RenderCredits(window);
 				window.display();
 				Event creditsEvent;
@@ -901,13 +996,19 @@ int main() {
 						}
 					}
 				}
+				if (optionsBackButton.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)
+					|| Joystick::isButtonPressed(0, 1)) {
+					sleep(milliseconds(200));
+					gameState = GameStates::START;
+					lastGameState = gameState;
+				}
 				break;
 
 			case GameStates::OPTIONS:
 				window.clear();
 				setOptions();
 				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
-				cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
+				UpdateMenus(mousePos, window);
 				RenderOptions(window);
 				window.display();
 
@@ -949,13 +1050,43 @@ int main() {
 						}
 					}
 				}
+				if (res1080Button.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)) {
+					sleep(milliseconds(200));
+					window.create(sf::VideoMode(1920, 1080), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
+					window.setView(view);
+				}
+				else if (res900Button.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)) {
+					sleep(milliseconds(200));
+					window.create(sf::VideoMode(1600, 900), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
+					window.setView(view);
+				}
+				else if (res720Button.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)) {
+					sleep(milliseconds(100));
+					window.create(sf::VideoMode(1280, 720), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
+					window.setView(view);
+				}
+				else if (resWindowedButton.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)) {
+					sleep(milliseconds(200));
+					window.create(sf::VideoMode(window.getSize().x, window.getSize().y), "Hotline Scunthorpe", Style::Titlebar | Style::Close);
+					window.setView(view);
+				}
+				else if (resFullscreenButton.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)) {
+					sleep(milliseconds(200));
+					window.create(sf::VideoMode(window.getSize().x, window.getSize().y), "Hotline Scunthorpe", Style::Fullscreen);
+					window.setView(view);
+				}
+				if (optionsBackButton.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)
+					|| Joystick::isButtonPressed(0, 1)) {
+					sleep(milliseconds(200));
+					gameState = lastGameState;
+				}
 				break;
 
 			case GameStates::LEVEL_1:
 				window.clear();
 				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
 				RenderLevel1(window);
-				Update(Vector2f(mousePos.x, mousePos.y), window);
+				Update(mousePos, window);
 				window.display();
 				Event level1Event;
 				while (window.pollEvent(level1Event)) {
@@ -968,12 +1099,17 @@ int main() {
 						}
 					}
 				}
+				if (Joystick::isButtonPressed(0, 7)) {
+					sleep(milliseconds(200));
+					cursorSprite.setPosition(960, 540);
+					gameState = GameStates::OPTIONS;;
+				}
 				break;
 			case GameStates::LEVEL_2:
 				window.clear();
 				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
 				RenderLevel2(window);
-				Update(Vector2f(mousePos.x, mousePos.y), window);
+				Update(mousePos, window);
 				window.display();
 				Event level2Event;
 				while (window.pollEvent(level2Event)) {
@@ -986,12 +1122,17 @@ int main() {
 						}
 					}
 				}
+				if (Joystick::isButtonPressed(0, 7)) {
+					sleep(milliseconds(200));
+					cursorSprite.setPosition(960, 540);
+					gameState = GameStates::OPTIONS;;
+				}
 				break;
 			case GameStates::GAME_OVER:
 				window.clear();
 				setGameOver();
 				mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
-				cursorSprite.setPosition(mousePos.x - cursorSprite.getGlobalBounds().width / 2, mousePos.y - cursorSprite.getGlobalBounds().height / 2);
+				UpdateMenus(mousePos, window);
 				RenderGameOver(window);
 				window.display();
 
@@ -1010,6 +1151,16 @@ int main() {
 							lastGameState = gameState;
 						}
 					}
+				}
+				if (optionsBackButton.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)
+					|| Joystick::isButtonPressed(0, 1)) {
+					sleep(milliseconds(200));
+					gameState = GameStates::START;
+					lastGameState = gameState;
+				}
+				else if (quitButton.getGlobalBounds().contains(cursorSprite.getPosition()) && Joystick::isButtonPressed(0, 0)) {
+					sleep(milliseconds(100));
+					window.close();
 				}
 				break;
 		}
