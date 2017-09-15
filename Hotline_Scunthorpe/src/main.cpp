@@ -46,15 +46,15 @@ SoundBuffer buzzBuffer, gunCockBuffer, gunShotBuffer, pistolBuffer, rifleBuffer,
 Sound turretGunSound, gunSounds, turretDeathSound, buzzSound, playerDeathSound, gunCockSound, winSound;
 
 // Start screen timer
-int startTimer = 0;
-int startRate = 60;
+float startTimer = 0;
+float startRate = 60;
 
 // Update timers for firing rates
-int firingTimer = 0;
-int enemyFiringTimer = 0;
-int playerFiringRate = 10;
-int enemyTurretAFiringRate = 15;
-int enemyTurretBFiringRate = 30;
+float firingTimer = 0;
+float enemyFiringTimer = 0;
+float playerFiringRate = 20.f;
+float enemyTurretAFiringRate = 30.f;
+float enemyTurretBFiringRate = 60.f;
 
 // Shooting bools
 bool isShooting = false;
@@ -289,7 +289,7 @@ public:
 	void incrementTimer(float rate) {
 		firingTimer += rate;
 	}
-	int getTimer() {
+	float getTimer() {
 		return firingTimer;
 	}
 	bool checkCollision(Bullet bullet) {
@@ -302,7 +302,7 @@ public:
 
 private:
 	RectangleShape enemy;
-	int firingTimer = 0;
+	float firingTimer = 0;
 	int type;
 };
 
@@ -443,7 +443,7 @@ void setOptions() {
 }
 
 void setLevel1() {
-	playerFiringRate = 10;
+	playerFiringRate = 20.f;
 	gunCockSound.setBuffer(gunCockBuffer);
 	gunCockSound.setVolume(30);
 	gunCockSound.play();
@@ -580,7 +580,7 @@ void UpdateStart(Vector2f &mousePos, RenderWindow &window) {
 	static sf::Clock clock;
 	float dt = clock.restart().asSeconds();
 	window.setFramerateLimit(60);
-	startTimer += (60 * dt);
+	startTimer += (60.f * dt);
 
 	if (startTimer > startRate) {
 		buzzSound.setBuffer(buzzBuffer);
@@ -588,7 +588,7 @@ void UpdateStart(Vector2f &mousePos, RenderWindow &window) {
 		buzzSound.play();
 		startScreenSprite.setTexture(startScreen2Texture);
 		window.draw(startScreenSprite);
-		if (startTimer > startRate+5) {
+		if (startTimer > startRate+5.f) {
 			buzzSound.stop();
 			startScreenSprite.setTexture(startScreenTexture);
 			window.draw(startScreenSprite);
@@ -648,15 +648,15 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 	Vector2f playerPos = playerSprite.getPosition();
 	Vector2f turretPos = enemyTurretASprite.getPosition();
 
-	firingTimer += (60 * dt);
+	firingTimer += (60.f * dt);
 
 	if (isShooting == true) {
-		if (playerFiringRate == 5) {
+		if (playerFiringRate == 10.f) {
 			gunSounds.setBuffer(rifleBuffer);
 			gunSounds.setVolume(10);
 			gunSounds.play();
 		}
-		else if (playerFiringRate == 10) {
+		else if (playerFiringRate == 20.f) {
 			gunSounds.setBuffer(pistolBuffer);
 			gunSounds.setVolume(10);
 			gunSounds.play();
@@ -790,7 +790,7 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 			move.y--;
 		}
 		if (Joystick::getAxisPosition(0, Joystick::Z) < -30 && firingTimer > playerFiringRate || Joystick::isButtonPressed(0, 0) && firingTimer > playerFiringRate) {
-			firingTimer = 0;
+			firingTimer = 0.f;
 			isShooting = true;
 		}
 		if (Joystick::getAxisPosition(0, Joystick::R) > 30 || Joystick::getAxisPosition(0, Joystick::R) < -30 || Joystick::getAxisPosition(0, Joystick::U) < -30 || Joystick::getAxisPosition(0, Joystick::U) > 30) {
@@ -809,7 +809,7 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
   playerSprite.move(move*300.f*dt);
 
 	if (Mouse::isButtonPressed(Mouse::Left) && firingTimer > playerFiringRate) {
-		firingTimer = 0;
+		firingTimer = 0.f;
 		isShooting = true;
 	}
 
@@ -817,7 +817,7 @@ void Update(Vector2f &mousePos, RenderWindow &window) {
 		playerSprite.setTexture(playerRifleTexture);
 		playerSprite.setOrigin(56, 82);
 		rifleSprite.setPosition(-500, -500);
-		playerFiringRate = 5;
+		playerFiringRate = 10.f;
 	}
 
   if (level1Exit.getGlobalBounds().contains(playerPos) && gameState == GameStates::LEVEL_1) {

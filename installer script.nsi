@@ -7,8 +7,7 @@
 # If you change the names "app.exe", "logo.ico", or "license.rtf" you should do a search and replace - they
 # show up in a few places.
 # All the other settings can be tweaked by editing the !defines at the top of this script
-!include "MUI2.nsh"
-!define MUI_ICON "icon.ico"
+
 !define APPNAME "Hotline Scunthorpe"
 !define COMPANYNAME "Beej's 2D Game"
 !define DESCRIPTION "Top down shoot'em'up."
@@ -26,13 +25,13 @@
  
 RequestExecutionLevel admin ;Require admin rights on NT6+ (When UAC is turned on)
  
-InstallDir "$PROGRAMFILES\${COMPANYNAME}\${APPNAME}"
+InstallDir "$PROGRAMFILES\${APPNAME}"
  
 # rtf or txt file - remember if it is txt, it must be in the DOS text format (\r\n)
 # This will be in the installer/uninstaller's title bar
 Name "${COMPANYNAME} - ${APPNAME}"
 Icon "icon.ico"
-outFile "HotLineScunthorpeInstaller.exe"
+outFile "HotlineScunthorpeInstaller.exe"
  
 !include LogicLib.nsh
  
@@ -59,10 +58,9 @@ section "install"
 	# Files for the install directory - to build the installer, these should be in the same directory as the install script (this file)
 	setOutPath $INSTDIR
 	# Files added here should be removed by the uninstaller (see section "uninstall")
-	file "build files\bin\DEBUG\Hotline_Scunthorpe_main.exe"
-    file "icon.ico"
+	file "bin\RELEASE\Hotline_Scunthorpe_main.exe"
 	# Add any other files for the install directory (license files, app data, etc) here
-    file /r "build files\bin\DEBUG\*.*"
+    file /r "bin\RELEASE\*.*"
 	# Uninstaller - See function un.onInit and section "uninstall" for configuration
 	writeUninstaller "$INSTDIR\HotlineScunthorpeUninstall.exe"
  
